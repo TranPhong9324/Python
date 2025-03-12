@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, colorchooser
 from PIL import Image, ImageTk
+from tkinter import filedialog, messagebox
+from PIL import ImageGrab
 
 class Paint:
     def __init__(self, root):
@@ -63,6 +65,8 @@ class Paint:
 
         ttk.Button(self.control_frame, text="CLEAR", command=self.clear_canvas).pack(side="right", padx=5)
 
+        ttk.Button(self.control_frame, text="SAVE", command=self.save).pack(side="right", padx=5)
+
     def choose_color(self):
         color = colorchooser.askcolor(title="Choose Color")[1]
         if color:
@@ -124,6 +128,25 @@ class Paint:
     def clear_canvas(self):
         self.canvas.delete("all")
 
+    def save(self):
+        file_path = filedialog.asksaveasfilename(
+        defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg"), ("All Files", "*.*")]
+    )
+    
+        if file_path:
+            try:
+                # Lấy kích thước và tọa độ của canvas
+                self.canvas.update()
+                x = self.root.winfo_rootx() + self.canvas.winfo_x()
+                y = self.root.winfo_rooty() + self.canvas.winfo_y()
+                x1 = x + self.canvas.winfo_width()
+                y1 = y + self.canvas.winfo_height()
+
+                # Chụp ảnh canvas và lưu file
+                ImageGrab.grab().crop((x, y, x1, y1)).save(file_path)
+                messagebox.showinfo("Save Drawing", "Ảnh lưu thành công!")
+            except Exception as e:
+                messagebox.showerror("Error", f"không thể lưu ảnh: {e}")
 def main():
     root = tk.Tk()
     app = Paint(root)
@@ -131,3 +154,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
